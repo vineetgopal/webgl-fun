@@ -5,32 +5,39 @@
 <script type="text/javascript" src="glUtils.js"></script>
 <script type="text/javascript" src="testing.js"></script>
 
-<script id="shader-fs" type="x-shader/x-fragment">
-      varying lowp vec4 vColor;
+<!-- Fragment shader program -->
+
+    <script id="shader-fs" type="x-shader/x-fragment">
+      varying highp vec2 vTextureCoord;
+      
+      uniform sampler2D uSampler;
       
       void main(void) {
-        gl_FragColor = vColor;
+        gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
       }
     </script>
-
-<script id="shader-vs" type="x-shader/x-vertex">
+    
+    <!-- Vertex shader program -->
+    
+    <script id="shader-vs" type="x-shader/x-vertex">
       attribute vec3 aVertexPosition;
-      attribute vec4 aVertexColor;
+      attribute vec2 aTextureCoord;
     
       uniform mat4 uMVMatrix;
       uniform mat4 uPMatrix;
       
-      varying lowp vec4 vColor;
+      varying highp vec2 vTextureCoord;
     
       void main(void) {
         gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-        vColor = aVertexColor;
+        vTextureCoord = aTextureCoord;
       }
     </script>
-
-</head>
-<body onload="start();">
-  <a href="test.html">WEEEE</a>
-  <canvas id="glcanvas" width="640" height="480">
-</body>
+  </head>
+  
+  <body onload="start()">
+    <canvas id="glcanvas" width="640" height="480">
+      Your browser doesn't appear to support the HTML5 <code>&lt;canvas&gt;</code> element.
+    </canvas>
+  </body>
 </html>
