@@ -2,6 +2,7 @@ var canvas;
 var gl;
 var squareVerticesBuffer;
 var squareVerticesColorBuffer;
+var cubeVerticesNormalBuffer;
 var cubeTexture;
 var mvMatrix;
 var shaderProgram;
@@ -196,6 +197,49 @@ function initBuffers() {
   
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,
       new Uint16Array(cubeVertexIndices), gl.STATIC_DRAW);
+
+  cubeVerticesNormalBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesNormalBuffer);
+  
+  var vertexNormals = [
+    // Front
+     0.0,  0.0,  1.0,
+     0.0,  0.0,  1.0,
+     0.0,  0.0,  1.0,
+     0.0,  0.0,  1.0,
+    
+    // Back
+     0.0,  0.0, -1.0,
+     0.0,  0.0, -1.0,
+     0.0,  0.0, -1.0,
+     0.0,  0.0, -1.0,
+    
+    // Top
+     0.0,  1.0,  0.0,
+     0.0,  1.0,  0.0,
+     0.0,  1.0,  0.0,
+     0.0,  1.0,  0.0,
+    
+    // Bottom
+     0.0, -1.0,  0.0,
+     0.0, -1.0,  0.0,
+     0.0, -1.0,  0.0,
+     0.0, -1.0,  0.0,
+    
+    // Right
+     1.0,  0.0,  0.0,
+     1.0,  0.0,  0.0,
+     1.0,  0.0,  0.0,
+     1.0,  0.0,  0.0,
+    
+    // Left
+    -1.0,  0.0,  0.0,
+    -1.0,  0.0,  0.0,
+    -1.0,  0.0,  0.0,
+    -1.0,  0.0,  0.0
+  ];
+  
+  gl.bufferData(gl.ARRAY_BUFFER, new WebGLFloatArray(vertexNormals), gl.STATIC_DRAW);
 }
 
 function drawScene() {
@@ -214,6 +258,9 @@ function drawScene() {
   gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesTextureCoordBuffer);
   gl.vertexAttribPointer(textureCoordAttribute, 2, gl.FLOAT, false, 0, 0);
 
+  gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesNormalBuffer);
+  gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
+
   gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, cubeTexture);
   gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler"), 0);
@@ -224,6 +271,11 @@ function drawScene() {
 
   mvPopMatrix();
 
+  var normalMatrix = mvMatrix.inverse();
+  normalMatrix = normalMatrix.transpose();
+  var nUniform = gl.getUniformLocation(shaderProgram, "uNormalMatrix");
+  gl.uniformMatrix4fv(nUniform, false, new WebGLFloatArray(normalMatrix.flatten()));
+  
   var currentTime = (new Date).getTime();
   if (lastSquareUpdateTime) {
     var delta = currentTime - lastSquareUpdateTime;
